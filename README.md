@@ -2,7 +2,9 @@
 
 Оптимизация Windows для игр, которая объясняет каждое изменение и умеет вернуть всё назад.
 
-![версия](https://img.shields.io/badge/версия-0.2.0-28E0B0) ![платформа](https://img.shields.io/badge/платформа-Windows%2010%2F11-informational) ![.NET](https://img.shields.io/badge/.NET-9-512BD4)
+[![скачать](https://img.shields.io/badge/Скачать-velocity--setup--0.2.0.exe-28E0B0?style=for-the-badge)](https://github.com/HumsteRD/Game-Optimization/releases/latest/download/velocity-setup-0.2.0.exe)
+
+![версия](https://img.shields.io/badge/версия-0.2.0-28E0B0) ![платформа](https://img.shields.io/badge/платформа-Windows%2010%2F11-informational) ![.NET](https://img.shields.io/badge/.NET-9-512BD4) [![релизы](https://img.shields.io/github/downloads/HumsteRD/Game-Optimization/total?label=скачиваний&color=28E0B0)](https://github.com/HumsteRD/Game-Optimization/releases)
 
 ---
 
@@ -53,9 +55,21 @@
 
 ## Установка
 
-Скачать `velocity-setup-0.2.0.exe` и запустить. Программа ставится **без запроса прав администратора** — права запрашиваются отдельно и только в момент, когда пользователь применяет настройки, которым они действительно нужны.
+**[Скачать установщик](https://github.com/HumsteRD/Game-Optimization/releases/latest/download/velocity-setup-0.2.0.exe)** (52 МБ) и запустить. Программа ставится **без запроса прав администратора** — права запрашиваются отдельно и только в момент, когда пользователь применяет настройки, которым они действительно нужны.
 
-.NET устанавливать не надо, всё уже внутри.
+.NET устанавливать не надо, всё уже внутри. Требуется Windows 10 версии 2004 или новее, 64 бита.
+
+При первом запуске Windows покажет предупреждение SmartScreen — файл пока без цифровой подписи. «Подробнее» → «Выполнить в любом случае».
+
+Проверить, что файл не подменён по дороге:
+
+```
+CertUtil -hashfile velocity-setup-0.2.0.exe SHA256
+```
+
+```
+78fb1d842ebda271eb3e484a831214f7751ce44db70529dee8c19609ae42833e
+```
 
 ---
 
