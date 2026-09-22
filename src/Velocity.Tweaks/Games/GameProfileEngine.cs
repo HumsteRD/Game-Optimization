@@ -129,7 +129,7 @@ public sealed class GameProfileEngine
             .ToList();
 
         return new GameApplyResult(match.Profile.Id, match.Profile.Name, files, drivers,
-            match.Profile.LaunchOptions, recommendations);
+            ResolveTokens(match.Profile.LaunchOptions, facts), recommendations);
     }
 
     /// <summary>Возвращает конфиги игры к сохранённым оригиналам.</summary>
@@ -142,6 +142,37 @@ public sealed class GameProfileEngine
             if (path is not null && ConfigFileEditor.Restore(path)) restored.Add(path);
         }
         return restored;
+    }
+
+    // ────────────────────── Подстановки по железу ──────────────────────
+
+    /// <summary>
+    /// Подставляет в текст значения, зависящие от конкретного компьютера.
+    ///
+    /// Зачем: параметр вроде «-maxMem=16384» нельзя зашивать константой — на машине
+    /// с 32 ГБ он искусственно ограничит игру вдвое, а на машине с 8 ГБ приведёт
+    /// к выходу за пределы физической памяти. Значение обязано считаться от факта.
+    /// </summary>
+    public static string? ResolveTokens(string? text, SystemFacts facts)
+    {
+        if (string.IsNullOrEmpty(text) || !text.Contains('{')) return text;
+
+        double ramGb = double.TryParse(facts.Get("ram.total_gb"),
+            System.Globalization.NumberStyles.Any,
+            System.Globalization.CultureInfo.InvariantCulture, out var gb) ? gb : 0;
+
+        int ramMb = (int)Math.Round(ramGb * 1024);
+
+        // Игре отдаём долю памяти, остальное оставляем системе, драйверу и лаунчеру.
+        // Округляем вниз до целого гигабайта — дробные значения движки не любят.
+        int Share(double fraction) => Math.Max(2048, (int)(ramMb * fraction / 1024) * 1024);
+
+        return text
+            .Replace("{ram_mb}", ramMb.ToString())
+            .Replace("{ram_mb_75}", Share(0.75).ToString())
+            .Replace("{ram_mb_50}", Share(0.50).ToString())
+            .Replace("{cpu_threads}", facts.Get("cpu.threads") ?? "4")
+            .Replace("{cpu_cores}", facts.Get("cpu.cores") ?? "4");
     }
 
     // ─────────────────────────── Пути ───────────────────────────

@@ -1,3 +1,5 @@
+using Velocity.Hardware.Cleanup;
+using System.Diagnostics;
 // Самопроверка перед выпуском.
 //
 // Это не модульные тесты: здесь проверяется, что каталог непротиворечив,
@@ -41,6 +43,61 @@ var irreversible = catalog.All
     .Where(t => t.Apply.OfType<CommandAction>().Any() && t.Revert.Count == 0)
     .Select(t => t.Id).ToList();
 Check("у всех командных твиков описан откат", irreversible.Count == 0, string.Join(", ", irreversible));
+
+Console.WriteLine("\n=== КАТАЛОГ ОЧИСТКИ ===");
+
+// Опасные места: путь очистки, ведущий сюда, означает потерю данных пользователя.
+string[] forbidden =
+[
+    Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+    Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
+    Environment.GetFolderPath(Environment.SpecialFolder.MyVideos),
+    Environment.GetFolderPath(Environment.SpecialFolder.MyMusic),
+    Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+    Environment.GetFolderPath(Environment.SpecialFolder.Windows),
+    Environment.GetFolderPath(Environment.SpecialFolder.System),
+    "C:\\"
+];
+
+var dangerous = new List<string>();
+var shallow = new List<string>();
+
+foreach (var target in CleanupCatalog.All)
+foreach (var template in target.Paths)
+{
+    var resolved = Path.GetFullPath(CleanupCatalog.Resolve(template)).TrimEnd('\\');
+
+    if (forbidden.Any(f => resolved.Equals(f.TrimEnd('\\'), StringComparison.OrdinalIgnoreCase)))
+        dangerous.Add($"{target.Id} → {resolved}");
+
+    // Путь из одного сегмента слишком близок к корню диска. Исключение —
+    // известные папки распаковки установщиков и старая копия Windows.
+    var depth = resolved.Split('\\', StringSplitOptions.RemoveEmptyEntries).Length;
+    if (depth < 2
+        && !resolved.EndsWith("NVIDIA", StringComparison.OrdinalIgnoreCase)
+        && !resolved.EndsWith("AMD", StringComparison.OrdinalIgnoreCase)
+        && !resolved.EndsWith("Windows.old", StringComparison.OrdinalIgnoreCase))
+        shallow.Add($"{target.Id} → {resolved}");
+}
+
+Check($"категорий очистки: {CleanupCatalog.All.Count}", CleanupCatalog.All.Count >= 8);
+Check("ни один путь не ведёт в личные папки пользователя", dangerous.Count == 0,
+    string.Join("; ", dangerous));
+Check("нет путей опасно близко к корню диска", shallow.Count == 0, string.Join("; ", shallow));
+
+var noConsequence = CleanupCatalog.All.Where(t => t.Consequence is null).Select(t => t.Id).ToList();
+Check("у каждой категории описаны последствия удаления", noConsequence.Count == 0,
+    string.Join(", ", noConsequence));
+
+// Поиск мусора запускается по кнопке, и пользователь ждёт результата на экране.
+var cleanupWatch = Stopwatch.StartNew();
+var junk = new CleanupScanner().Scan();
+cleanupWatch.Stop();
+Check($"поиск мусора за {cleanupWatch.ElapsedMilliseconds} мс", cleanupWatch.ElapsedMilliseconds < 5000);
+Console.WriteLine($"        найдено к удалению: {junk.Sum(j => j.SizeBytes) / 1024 / 1024} МБ " +
+                  $"в {junk.Count} категориях");
 
 Console.WriteLine("\n=== ПРОФИЛИ ИГР ===");
 var profiles = GameProfileEngine.Load();

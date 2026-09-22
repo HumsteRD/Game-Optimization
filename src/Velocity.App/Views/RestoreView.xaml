@@ -19,7 +19,7 @@
                 <TextBlock Text="Точки отката" Style="{StaticResource TextTitle}"/>
                 <TextBlock x:Name="SubtitleText" Style="{StaticResource TextMuted}" Margin="0,4,0,0"/>
                 <TextBlock Style="{StaticResource TextBody}" Margin="0,12,0,0" FontSize="{StaticResource FontSm}"
-                           MaxWidth="640" HorizontalAlignment="Left"
+                           MaxWidth="640" HorizontalAlignment="Stretch"
                            Text="Перед каждым применением состояние системы сохраняется целиком. Откат возвращает значения ровно такими, какими они были — включая те, которых вообще не существовало до изменения."/>
             </StackPanel>
             <Button x:Name="RefreshButton" Content="Обновить" Style="{StaticResource ButtonGhost}"

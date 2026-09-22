@@ -84,6 +84,10 @@
                                      Content="Профили игр" GroupName="Nav" Tag="Games"
                                      Checked="Nav_Checked"/>
 
+                        <RadioButton x:Name="NavCleanup" Style="{StaticResource NavItem}"
+                                     Content="Очистка диска" GroupName="Nav" Tag="Cleanup"
+                                     Checked="Nav_Checked"/>
+
                         <TextBlock Text="БЕЗОПАСНОСТЬ" Style="{StaticResource TextLabel}" Margin="20,18,0,6"/>
                         <RadioButton x:Name="NavRestore" Style="{StaticResource NavItem}"
                                      Content="Точки отката" GroupName="Nav" Tag="Restore"

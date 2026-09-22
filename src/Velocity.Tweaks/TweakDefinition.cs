@@ -40,7 +40,8 @@ public sealed class TweakDefinition
     /// </summary>
     public TweakAction? Detect
     {
-        get => _detect ?? Apply.FirstOrDefault(a => a is RegistryAction or PowerCfgAction or NvidiaProfileAction);
+        get => _detect ?? Apply.FirstOrDefault(a =>
+            a is RegistryAction or PowerCfgAction or NvidiaProfileAction or JsonFileAction);
         init => _detect = value;
     }
     private readonly TweakAction? _detect;
@@ -50,6 +51,19 @@ public sealed class TweakDefinition
 
     /// <summary>В какие пресеты входит твик.</summary>
     public List<TweakPreset> Presets { get; init; } = [];
+
+    /// <summary>
+    /// Пошаговая инструкция для настроек, которые программа применить не может
+    /// физически — например, включение XMP в BIOS. Без неё пункт превращается
+    /// в упрёк «у тебя плохо настроено» без объяснения, что с этим делать.
+    /// </summary>
+    public List<string> ManualSteps { get; init; } = [];
+
+    /// <summary>
+    /// Настройка выполняется руками пользователя: программа только объясняет,
+    /// куда идти и что нажимать.
+    /// </summary>
+    public bool IsManual => Apply.Count == 0 && ManualSteps.Count > 0;
 
     public List<string> Sources { get; init; } = [];
 }
@@ -94,6 +108,7 @@ public enum TweakPreset { Safe, Gaming, Competitive, Maximum, Extreme, Laptop }
 [JsonDerivedType(typeof(ServiceAction), "service")]
 [JsonDerivedType(typeof(NvidiaProfileAction), "nvidia_profile")]
 [JsonDerivedType(typeof(CommandAction), "command")]
+[JsonDerivedType(typeof(JsonFileAction), "json_file")]
 public abstract class TweakAction
 {
     /// <summary>Человекочитаемое описание действия для журнала.</summary>
@@ -112,6 +127,13 @@ public sealed class RegistryAction : TweakAction
     public string? Value { get; init; }
     /// <summary>Ожидаемое значение при проверке состояния (detect).</summary>
     public string? Expected { get; init; }
+
+    /// <summary>
+    /// Настройка считается применённой, когда значения в реестре НЕТ.
+    /// Отдельный флаг нужен потому, что «значение отсутствует» и «значение пустое» —
+    /// разные состояния, и пустой строкой первое не выразить.
+    /// </summary>
+    public bool ExpectAbsent { get; init; }
 
     public override string Describe() =>
         Value is null ? $"{Hive}\\{Path} → удалить {Name}" : $"{Hive}\\{Path}\\{Name} = {Value}";
@@ -172,6 +194,22 @@ public sealed class NvidiaProfileAction : TweakAction
 
     public override string Describe() =>
         $"NVIDIA: {Setting} = {Value}" + (Application is null ? " (глобально)" : $" ({Application})");
+}
+
+/// <summary>
+/// Настройка программы, которая хранит конфигурацию в JSON — например Discord.
+/// Меняется ровно одно свойство, остальной файл остаётся нетронутым.
+/// </summary>
+public sealed class JsonFileAction : TweakAction
+{
+    /// <summary>Путь с подстановками: {appdata}, {localappdata}, {documents}, {userprofile}.</summary>
+    public required string File { get; init; }
+    public required string Property { get; init; }
+    public required string Value { get; init; }
+    /// <summary>bool | number | string.</summary>
+    public string Kind { get; init; } = "bool";
+
+    public override string Describe() => $"{System.IO.Path.GetFileName(File)}: {Property} = {Value}";
 }
 
 public sealed class CommandAction : TweakAction

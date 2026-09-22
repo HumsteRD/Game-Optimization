@@ -97,6 +97,7 @@ public sealed class TweakEngine(SystemFacts facts, SnapshotStore? store = null)
                 PowerCfgAction pc => CheckPower(pc),
                 DisplayModeAction dm => CheckDisplay(dm),
                 NvidiaProfileAction nv => CheckNvidia(nv),
+                JsonFileAction js => JsonFileExecutor.Check(js),
                 _ => false
             };
             return new TweakStatus(tweak, applied ? TweakState.Applied : TweakState.NotApplied);
@@ -213,6 +214,10 @@ public sealed class TweakEngine(SystemFacts facts, SnapshotStore? store = null)
         if (!Facts.MatchesAll(tweak.Requires))
             return new ApplyResult(tweak.Id, tweak.Title, ApplyOutcome.Skipped, "не подходит этой конфигурации");
 
+        if (tweak.IsManual)
+            return new ApplyResult(tweak.Id, tweak.Title, ApplyOutcome.Skipped,
+                "настройка выполняется вручную — программа её изменить не может");
+
         if (tweak.Apply.OfType<CommandAction>().Any() && tweak.Revert.Count == 0)
             return new ApplyResult(tweak.Id, tweak.Title, ApplyOutcome.Skipped,
                 "в каталоге не описан откат для команды — применять необратимое запрещено");
@@ -287,6 +292,7 @@ public sealed class TweakEngine(SystemFacts facts, SnapshotStore? store = null)
         DisplayModeAction dm => DisplayExecutor.Capture(dm),
         ServiceAction svc => [ServiceExecutor.Capture(svc)],
         NvidiaProfileAction nv => [NvidiaExecutor.Capture(nv)],
+        JsonFileAction js => [JsonFileExecutor.Capture(js)],
         // Произвольные команды снимку не поддаются — для них твик обязан
         // задавать собственный блок revert.
         _ => []
@@ -302,6 +308,7 @@ public sealed class TweakEngine(SystemFacts facts, SnapshotStore? store = null)
             case ServiceAction svc: ServiceExecutor.Apply(svc); break;
             case CommandAction cmd: CommandExecutor.Apply(cmd); break;
             case NvidiaProfileAction nv: NvidiaExecutor.Apply(nv); break;
+            case JsonFileAction js: JsonFileExecutor.Apply(js); break;
             default: throw new NotSupportedException($"Действие {action.GetType().Name} не поддерживается");
         }
     }
@@ -351,6 +358,7 @@ public sealed class TweakEngine(SystemFacts facts, SnapshotStore? store = null)
                 case "display": DisplayExecutor.Restore(record); break;
                 case "service": ServiceExecutor.Restore(record); break;
                 case "nvidia": NvidiaExecutor.Restore(record); break;
+                case "json": JsonFileExecutor.Restore(record); break;
                 case "command":
                     if (record.Value is { } arguments)
                         CommandExecutor.Apply(new CommandAction { Executable = record.Target, Arguments = arguments });

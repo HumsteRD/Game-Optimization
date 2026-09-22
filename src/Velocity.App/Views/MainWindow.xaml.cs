@@ -22,12 +22,24 @@ public partial class MainWindow : Window
 
         AdminBadge.Visibility = TweakEngine.IsElevated() ? Visibility.Visible : Visibility.Collapsed;
 
-        Show("Dashboard");
+        // Раздел можно открыть сразу: Velocity.exe --view Cleanup.
+        // Удобно для ярлыка на конкретную функцию и для проверки интерфейса.
+        var args = Environment.GetCommandLineArgs();
+        var index = Array.IndexOf(args, "--view");
+        var start = index >= 0 && index + 1 < args.Length ? args[index + 1] : "Dashboard";
+
+        Show(start);
+        foreach (var nav in new[] { NavDashboard, NavOptimize, NavGames, NavCleanup, NavRestore, NavSettings })
+            if ((string)nav.Tag == start) nav.IsChecked = true;
         Loaded += async (_, _) =>
         {
             SetStatus("Сканирование системы…");
             await AppState.Current.ScanAsync();
             SetStatus($"Скан занял {AppState.Current.Report?.ScanDurationMs} мс");
+
+            // Проверку обновлений делаем после скана: она не должна задерживать
+            // первое появление данных на экране.
+            await UpdateFlow.CheckOnStartupAsync(this);
         };
     }
 
@@ -50,6 +62,7 @@ public partial class MainWindow : Window
                 "Dashboard" => new DashboardView(),
                 "Optimize" => new OptimizeView(),
                 "Games" => new GamesView(),
+                "Cleanup" => new CleanupView(),
                 "Restore" => new RestoreView(),
                 "Settings" => new SettingsView(),
                 _ => new DashboardView()

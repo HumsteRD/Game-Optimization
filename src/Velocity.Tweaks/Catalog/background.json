@@ -1,0 +1,155 @@
+[
+  {
+    "Id": "discord.hardware_accel_off",
+    "Category": "Background",
+    "Title": "Discord: отключить аппаратное ускорение",
+    "Description": "Discord построен на браузерном движке и по умолчанию рендерит интерфейс на видеокарте. Пока ты просто переписываешься, он молча отъедает часть той же видеокарты, которая в этот момент рисует игру. На слабых и средних картах это стоит нескольких процентов кадров и добавляет микрорывки при появлении уведомлений.\n\nВажный нюанс: если ты стримишь через Discord или включаешь демонстрацию экрана, аппаратное ускорение наоборот нужно — без него кодирование ложится на процессор. Тогда этот пункт лучше не применять.",
+    "Effect": "Интерфейс Discord рисуется процессором, видеокарта освобождается",
+    "ExpectedGain": "Обычно +2–5% FPS на средних видеокартах",
+    "Risk": "Moderate",
+    "Confidence": "Community",
+    "RequiresGameClosed": false,
+    "Presets": [
+      "Gaming",
+      "Competitive",
+      "Maximum",
+      "Extreme"
+    ],
+    "Apply": [
+      {
+        "type": "json_file",
+        "File": "{appdata}\\discord\\settings.json",
+        "Property": "enableHardwareAcceleration",
+        "Value": "false",
+        "Kind": "bool"
+      }
+    ],
+    "ManualSteps": [
+      "После применения Discord нужно полностью перезапустить: щелчок по крестику его только сворачивает.",
+      "Правой кнопкой по значку Discord в трее возле часов → «Quit Discord», затем запусти заново."
+    ]
+  },
+  {
+    "Id": "discord.autostart_off",
+    "Category": "Background",
+    "Title": "Discord: не запускаться вместе с Windows",
+    "Description": "Discord прописывает себя в автозагрузку и стартует раньше рабочего стола, попутно проверяя обновления. Запускать его вручную, когда он действительно нужен, быстрее и для загрузки системы, и для первых минут работы.",
+    "Effect": "Discord убран из автозагрузки",
+    "ExpectedGain": "Быстрее загрузка Windows, меньше фоновой активности",
+    "Risk": "Safe",
+    "Confidence": "Documented",
+    "RequiresGameClosed": false,
+    "Presets": [
+      "Competitive",
+      "Maximum",
+      "Extreme"
+    ],
+    "Detect": {
+      "type": "registry",
+      "Hive": "HKCU",
+      "Path": "Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+      "Name": "Discord",
+      "ExpectAbsent": true
+    },
+    "Apply": [
+      {
+        "type": "registry",
+        "Hive": "HKCU",
+        "Path": "Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+        "Name": "Discord",
+        "Value": null
+      }
+    ]
+  },
+  {
+    "Id": "bg.epic_autostart_off",
+    "Category": "Background",
+    "Title": "Epic Games: не запускаться вместе с Windows",
+    "Description": "Лаунчер Epic Games стартует вместе с системой и остаётся висеть в фоне, даже если ты сегодня не собирался играть. Держать его запущенным ради самих игр не нужно — они сами поднимут лаунчер при запуске.",
+    "Effect": "Лаунчер Epic Games убран из автозагрузки",
+    "ExpectedGain": "Быстрее загрузка Windows, минус один фоновый процесс",
+    "Risk": "Safe",
+    "Confidence": "Documented",
+    "RequiresGameClosed": false,
+    "Presets": [
+      "Competitive",
+      "Maximum",
+      "Extreme"
+    ],
+    "Detect": {
+      "type": "registry",
+      "Hive": "HKCU",
+      "Path": "Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+      "Name": "EpicGamesLauncher",
+      "ExpectAbsent": true
+    },
+    "Apply": [
+      {
+        "type": "registry",
+        "Hive": "HKCU",
+        "Path": "Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+        "Name": "EpicGamesLauncher",
+        "Value": null
+      }
+    ]
+  },
+  {
+    "Id": "bg.onedrive_autostart_off",
+    "Category": "Background",
+    "Title": "OneDrive: не запускаться вместе с Windows",
+    "Description": "OneDrive синхронизирует файлы в фоне, не спрашивая, играешь ли ты сейчас. Дисковая и сетевая активность посреди загрузки уровня — это фриз на ровном месте.\n\nСинхронизация при этом никуда не денется: запусти OneDrive вручную, когда он понадобится, и он догонит изменения.",
+    "Effect": "OneDrive убран из автозагрузки",
+    "ExpectedGain": "Меньше фоновых обращений к диску во время игры",
+    "Risk": "Moderate",
+    "Confidence": "Documented",
+    "RequiresGameClosed": false,
+    "Presets": [
+      "Competitive",
+      "Maximum",
+      "Extreme"
+    ],
+    "Detect": {
+      "type": "registry",
+      "Hive": "HKCU",
+      "Path": "Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+      "Name": "OneDrive",
+      "ExpectAbsent": true
+    },
+    "Apply": [
+      {
+        "type": "registry",
+        "Hive": "HKCU",
+        "Path": "Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+        "Name": "OneDrive",
+        "Value": null
+      }
+    ]
+  },
+  {
+    "Id": "bg.overlay_advice",
+    "Category": "Background",
+    "Title": "Оставить не больше двух игровых оверлеев",
+    "Description": "Каждый оверлей встраивается в цепочку вывода кадра: Steam, Discord, NVIDIA, MSI Afterburner, RTSS, софт клавиатуры и мыши. Три и больше подряд — это уже не потеря средних кадров, а регулярные скачки времени кадра, те самые необъяснимые рывки в спокойной сцене.\n\nОтключать все не нужно: один счётчик кадров и один оверлей связи проблемы не создают. Проблема начинается, когда они множатся.",
+    "Effect": "Меньше перехватчиков в цепочке вывода кадра",
+    "ExpectedGain": "Заметно ровнее просадки 1% low",
+    "Risk": "Safe",
+    "Confidence": "Measured",
+    "RequiresGameClosed": false,
+    "Presets": [
+      "Safe",
+      "Gaming",
+      "Competitive",
+      "Maximum",
+      "Extreme",
+      "Laptop"
+    ],
+    "ManualSteps": [
+      "Steam: Настройки → В игре → выключи «Включить оверлей Steam в игре», если не пользуешься им для скриншотов и браузера.",
+      "Discord: Настройки → Игровой оверлей → выключи «Включить внутриигровой оверлей». В Valorant и CS2 он всё равно бесполезен, а кадры отъедает.",
+      "NVIDIA App: Настройки → выключи «Внутриигровой оверлей», если не записываешь повторы.",
+      "MSI Afterburner и RTSS: оставь только один счётчик кадров. Afterburner показывает через RTSS, поэтому два одновременно включённых оверлея — это двойная работа.",
+      "Софт мыши и клавиатуры (iCUE, Synapse, G HUB, Armoury Crate): у них тоже есть внутриигровые оверлеи, и они включены по умолчанию.",
+      "После изменений вернись в программу и нажми «Пересканировать» — в разделе «Обзор» видно, сколько оверлеев осталось активно."
+    ]
+  }
+]

@@ -91,10 +91,15 @@ public static class RegistryExecutor
     /// <summary>Совпадает ли текущее значение с ожидаемым (для detect / verify).</summary>
     public static bool Check(RegistryAction action)
     {
+        var current = Capture(action).Value;
+
+        // Твики вида «убрать из автозагрузки» применены ровно тогда,
+        // когда значения в реестре больше нет.
+        if (action.ExpectAbsent) return current is null;
+
         var expected = action.Expected ?? action.Value;
         if (expected is null) return false;
 
-        var current = Capture(action).Value;
         return current is not null && current.Equals(expected, StringComparison.OrdinalIgnoreCase);
     }
 

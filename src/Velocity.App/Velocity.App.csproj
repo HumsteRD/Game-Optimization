@@ -13,7 +13,7 @@
 
     <Product>VELOCITY</Product>
     <AssemblyTitle>VELOCITY — оптимизация ПК для игр</AssemblyTitle>
-    <Version>0.2.0</Version>
+    <Version>0.3.0</Version>
     <Company>VELOCITY</Company>
 
     <PublishSingleFile>true</PublishSingleFile>

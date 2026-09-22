@@ -76,7 +76,7 @@ public partial class OptimizeView : UserControl
                     State = status.State,
                     // По умолчанию отмечаем то, что ещё не применено: пользователь
                     // нажимает «Применить» и получает ожидаемый результат без лишних кликов.
-                    IsSelected = status.State is TweakState.NotApplied or TweakState.Unknown
+                    IsSelected = !tweak.IsManual && status.State is TweakState.NotApplied or TweakState.Unknown
                 };
                 item.PropertyChanged += (_, e) =>
                 {
@@ -118,6 +118,16 @@ public partial class OptimizeView : UserControl
         _preset = tag == "All" ? null : Enum.Parse<TweakPreset>(tag);
         if (PresetHint is not null) PresetHint.Text = PresetHints.GetValueOrDefault(tag, "");
         if (AppState.Current.HasReport) Reload();
+    }
+
+    /// <summary>
+    /// Клик по строке раскрывает справку. Переключатель при этом не трогаем:
+    /// он обрабатывает своё нажатие сам и до сюда событие не доводит.
+    /// </summary>
+    private void Row_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (sender is FrameworkElement { DataContext: TweakItem item })
+            item.IsExpanded = !item.IsExpanded;
     }
 
     private void SelectAll_Click(object sender, RoutedEventArgs e)

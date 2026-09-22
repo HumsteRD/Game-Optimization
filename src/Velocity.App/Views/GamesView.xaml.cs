@@ -58,7 +58,7 @@ public partial class GamesView : UserControl
                 Id = m.Profile.Id,
                 Name = m.Profile.Name,
                 Location = Describe(m.Installed),
-                LaunchOptions = m.Profile.LaunchOptions,
+                LaunchOptions = GameProfileEngine.ResolveTokens(m.Profile.LaunchOptions, state.Facts),
                 LaunchOptionsWhy = m.Profile.LaunchOptionsWhy,
                 Notes = m.Profile.Notes,
                 // Совет показываем только если он относится к этому железу.
