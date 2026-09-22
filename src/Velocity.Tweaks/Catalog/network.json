@@ -1,0 +1,69 @@
+[
+  {
+    "Id": "net.tcp_autotuning",
+    "Category": "Network",
+    "Title": "Вернуть автонастройку окна TCP в норму",
+    "Description": "Автонастройка приёмного окна TCP по умолчанию включена и работает правильно. Но её массово советуют отключать в «оптимизаторах», после чего скорость загрузки падает в разы. Этот пункт возвращает штатное значение, если его кто-то сломал.",
+    "Effect": "Уровень автонастройки = обычный",
+    "ExpectedGain": "Восстанавливает нормальную скорость загрузки",
+    "Risk": "Safe",
+    "Confidence": "Documented",
+    "RequiresElevation": true,
+    "Presets": [
+      "Safe",
+      "Gaming",
+      "Competitive",
+      "Maximum",
+      "Extreme",
+      "Laptop"
+    ],
+    "Apply": [
+      {
+        "type": "command",
+        "Executable": "netsh",
+        "Arguments": "int tcp set global autotuninglevel=normal"
+      }
+    ],
+    "Revert": [
+      {
+        "type": "command",
+        "Executable": "netsh",
+        "Arguments": "int tcp set global autotuninglevel=normal"
+      }
+    ]
+  },
+  {
+    "Id": "net.rss_on",
+    "Category": "Network",
+    "Title": "Распределять обработку сети по ядрам процессора",
+    "Description": "Receive Side Scaling раскидывает обработку входящих пакетов по нескольким ядрам. Без него весь сетевой трафик обрабатывает нулевое ядро — то самое, которое в играх обычно и так загружено сильнее всех.",
+    "Effect": "RSS включён",
+    "ExpectedGain": "Ровнее пинг под нагрузкой, меньше нагрузка на нулевое ядро",
+    "Risk": "Safe",
+    "Confidence": "Documented",
+    "RequiresElevation": true,
+    "Requires": [
+      "cpu.cores>=4"
+    ],
+    "Presets": [
+      "Gaming",
+      "Competitive",
+      "Maximum",
+      "Extreme"
+    ],
+    "Apply": [
+      {
+        "type": "command",
+        "Executable": "netsh",
+        "Arguments": "int tcp set global rss=enabled"
+      }
+    ],
+    "Revert": [
+      {
+        "type": "command",
+        "Executable": "netsh",
+        "Arguments": "int tcp set global rss=enabled"
+      }
+    ]
+  }
+]

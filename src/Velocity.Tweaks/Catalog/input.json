@@ -1,0 +1,72 @@
+[
+  {
+    "Id": "input.mouse_accel_off",
+    "Category": "Input",
+    "Title": "Отключить акселерацию мыши",
+    "Description": "«Повышенная точность установки указателя» меняет пройденное курсором расстояние в зависимости от скорости движения руки. В шутерах это ломает мышечную память: один и тот же взмах даёт разный поворот. Это первое, что выключает любой соревновательный игрок.",
+    "Effect": "Акселерация и пороги ускорения обнулены",
+    "ExpectedGain": "Стабильное прицеливание. На FPS не влияет",
+    "Risk": "Safe",
+    "Confidence": "Measured",
+    "RequiresGameClosed": false,
+    "Presets": ["Safe", "Gaming", "Competitive", "Maximum", "Extreme", "Laptop"],
+    "Detect": { "type": "registry", "Hive": "HKCU", "Path": "Control Panel\\Mouse", "Name": "MouseSpeed", "Expected": "0" },
+    "Apply": [
+      { "type": "registry", "Hive": "HKCU", "Path": "Control Panel\\Mouse", "Name": "MouseSpeed", "Kind": "string", "Value": "0" },
+      { "type": "registry", "Hive": "HKCU", "Path": "Control Panel\\Mouse", "Name": "MouseThreshold1", "Kind": "string", "Value": "0" },
+      { "type": "registry", "Hive": "HKCU", "Path": "Control Panel\\Mouse", "Name": "MouseThreshold2", "Kind": "string", "Value": "0" }
+    ]
+  },
+  {
+    "Id": "input.mouse_sensitivity_1to1",
+    "Category": "Input",
+    "Title": "Чувствительность мыши один к одному",
+    "Description": "Любое значение системной чувствительности кроме 10 (шестая позиция из одиннадцати в панели управления) заставляет Windows масштабировать отсчёты сенсора. Появляются пропуски и неравномерность движения. Чувствительность нужно менять через DPI мыши, а не ползунком Windows.",
+    "Effect": "Системная чувствительность = 10 из 20, без масштабирования",
+    "ExpectedGain": "Курсор отрабатывает каждый отсчёт сенсора",
+    "Risk": "Safe",
+    "Confidence": "Measured",
+    "RequiresGameClosed": false,
+    "Presets": ["Safe", "Gaming", "Competitive", "Maximum", "Extreme", "Laptop"],
+    "Detect": { "type": "registry", "Hive": "HKCU", "Path": "Control Panel\\Mouse", "Name": "MouseSensitivity", "Expected": "10" },
+    "Apply": [
+      { "type": "registry", "Hive": "HKCU", "Path": "Control Panel\\Mouse", "Name": "MouseSensitivity", "Kind": "string", "Value": "10" }
+    ]
+  },
+  {
+    "Id": "input.filter_keys_off",
+    "Category": "Input",
+    "Title": "Отключить фильтрацию клавиш",
+    "Description": "Функция специальных возможностей игнорирует слишком быстрые нажатия. Включается случайно, если пять раз подряд нажать Shift, и потом человек неделями думает, что у него клавиатура пропускает нажатия.",
+    "Effect": "Фильтрация ввода с клавиатуры отключена",
+    "ExpectedGain": "Клавиатура перестаёт терять быстрые нажатия",
+    "Risk": "Safe",
+    "Confidence": "Documented",
+    "RequiresGameClosed": false,
+    "Presets": ["Safe", "Gaming", "Competitive", "Maximum", "Extreme", "Laptop"],
+    "Detect": { "type": "registry", "Hive": "HKCU", "Path": "Control Panel\\Accessibility\\Keyboard Response", "Name": "Flags", "Expected": "122" },
+    "Apply": [
+      { "type": "registry", "Hive": "HKCU", "Path": "Control Panel\\Accessibility\\Keyboard Response", "Name": "Flags", "Kind": "string", "Value": "122" },
+      { "type": "registry", "Hive": "HKCU", "Path": "Control Panel\\Accessibility\\StickyKeys", "Name": "Flags", "Kind": "string", "Value": "506" },
+      { "type": "registry", "Hive": "HKCU", "Path": "Control Panel\\Accessibility\\ToggleKeys", "Name": "Flags", "Kind": "string", "Value": "58" }
+    ]
+  },
+  {
+    "Id": "input.mouse_queue_size",
+    "Category": "Input",
+    "Title": "Уменьшить очередь событий мыши",
+    "Description": "Размер буфера событий мыши по умолчанию рассчитан на офисный сценарий. Меньшая очередь чуть снижает задержку на высокой частоте опроса. Эффект небольшой и ощущается не всеми — поэтому пункт только в расширенных пресетах.",
+    "Effect": "MouseDataQueueSize = 50, требуется перезагрузка",
+    "ExpectedGain": "Доли миллисекунды задержки ввода",
+    "Risk": "Advanced",
+    "Confidence": "Community",
+    "RequiresElevation": true,
+    "RequiresReboot": true,
+    "Presets": ["Competitive", "Extreme"],
+    "Detect": { "type": "registry", "Hive": "HKLM", "Path": "SYSTEM\\CurrentControlSet\\Services\\mouclass\\Parameters", "Name": "MouseDataQueueSize", "Expected": "50" },
+    "Apply": [
+      { "type": "registry", "Hive": "HKLM", "Path": "SYSTEM\\CurrentControlSet\\Services\\mouclass\\Parameters", "Name": "MouseDataQueueSize", "Kind": "dword", "Value": "50" },
+      { "type": "registry", "Hive": "HKLM", "Path": "SYSTEM\\CurrentControlSet\\Services\\kbdclass\\Parameters", "Name": "KeyboardDataQueueSize", "Kind": "dword", "Value": "50" }
+    ]
+  }
+]

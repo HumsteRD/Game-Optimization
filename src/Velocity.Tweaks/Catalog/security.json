@@ -1,0 +1,38 @@
+[
+  {
+    "Id": "sec.hvci_off",
+    "Category": "Security",
+    "Title": "Отключить «Целостность памяти» (Memory Integrity)",
+    "Description": "Самый крупный одиночный источник потерь производительности на Windows 11: гипервизор проверяет драйверы в реальном времени. В играх, упирающихся в процессор, это обычно 5–15% кадров.\n\nЧто теряешь: защиту от подмены драйверов в памяти. Для домашнего ПК риск умеренный, но он реален. Решение принимаешь ты, а не программа.",
+    "Effect": "HypervisorEnforcedCodeIntegrity = 0, требуется перезагрузка",
+    "ExpectedGain": "Обычно +5–15% FPS при упоре в процессор",
+    "Risk": "Expert",
+    "Confidence": "Measured",
+    "RequiresElevation": true,
+    "RequiresReboot": true,
+    "Requires": ["tuning.hvci=true"],
+    "Presets": ["Extreme"],
+    "Detect": { "type": "registry", "Hive": "HKLM", "Path": "SYSTEM\\CurrentControlSet\\Control\\DeviceGuard\\Scenarios\\HypervisorEnforcedCodeIntegrity", "Name": "Enabled", "Expected": "0" },
+    "Apply": [
+      { "type": "registry", "Hive": "HKLM", "Path": "SYSTEM\\CurrentControlSet\\Control\\DeviceGuard\\Scenarios\\HypervisorEnforcedCodeIntegrity", "Name": "Enabled", "Kind": "dword", "Value": "0" }
+    ]
+  },
+  {
+    "Id": "sec.vbs_off",
+    "Category": "Security",
+    "Title": "Отключить безопасность на основе виртуализации (VBS)",
+    "Description": "Windows запускает саму себя поверх гипервизора. Даже без «Целостности памяти» это стоит нескольких процентов в играх, упирающихся в процессор.\n\nВажно: VBS нужен для WSL2, Hyper-V, Docker Desktop и «Песочницы Windows». Если ты ими пользуешься — этот пункт не трогай, всё перестанет запускаться.",
+    "Effect": "EnableVirtualizationBasedSecurity = 0, требуется перезагрузка",
+    "ExpectedGain": "Обычно +3–10% FPS при упоре в процессор",
+    "Risk": "Expert",
+    "Confidence": "Measured",
+    "RequiresElevation": true,
+    "RequiresReboot": true,
+    "Requires": ["tuning.vbs=true"],
+    "Presets": ["Extreme"],
+    "Detect": { "type": "registry", "Hive": "HKLM", "Path": "SYSTEM\\CurrentControlSet\\Control\\DeviceGuard", "Name": "EnableVirtualizationBasedSecurity", "Expected": "0" },
+    "Apply": [
+      { "type": "registry", "Hive": "HKLM", "Path": "SYSTEM\\CurrentControlSet\\Control\\DeviceGuard", "Name": "EnableVirtualizationBasedSecurity", "Kind": "dword", "Value": "0" }
+    ]
+  }
+]

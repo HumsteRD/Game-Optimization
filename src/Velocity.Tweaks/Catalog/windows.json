@@ -1,0 +1,164 @@
+[
+  {
+    "Id": "win.gamedvr_off",
+    "Category": "Windows",
+    "Title": "Отключить фоновую запись Game DVR",
+    "Description": "Xbox Game Bar постоянно держит в памяти буфер записи последних минут игры. Это стоит кадров даже тогда, когда ты ничего не записываешь и не собираешься.",
+    "Effect": "Фоновая запись отключена",
+    "ExpectedGain": "Обычно +2–6% FPS и меньше просадок 1% low",
+    "Risk": "Safe",
+    "Confidence": "Measured",
+    "Presets": ["Safe", "Gaming", "Competitive", "Maximum", "Extreme", "Laptop"],
+    "Detect": { "type": "registry", "Hive": "HKCU", "Path": "System\\GameConfigStore", "Name": "GameDVR_Enabled", "Expected": "0" },
+    "Apply": [
+      { "type": "registry", "Hive": "HKCU", "Path": "System\\GameConfigStore", "Name": "GameDVR_Enabled", "Kind": "dword", "Value": "0" },
+      { "type": "registry", "Hive": "HKCU", "Path": "Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR", "Name": "AppCaptureEnabled", "Kind": "dword", "Value": "0" }
+    ]
+  },
+  {
+    "Id": "win.game_mode_on",
+    "Category": "Windows",
+    "Title": "Включить игровой режим Windows",
+    "Description": "В Windows 11 игровой режим перестал быть пустышкой: он приоритизирует игру и откладывает установку обновлений и перезапуск драйверов, пока игра запущена.",
+    "Effect": "Игровой режим включён",
+    "ExpectedGain": "Меньше случайных фризов от фоновых задач",
+    "Risk": "Safe",
+    "Confidence": "Documented",
+    "Requires": ["os.build>=22000"],
+    "Presets": ["Safe", "Gaming", "Competitive", "Maximum", "Extreme", "Laptop"],
+    "Detect": { "type": "registry", "Hive": "HKCU", "Path": "Software\\Microsoft\\GameBar", "Name": "AutoGameModeEnabled", "Expected": "1" },
+    "Apply": [
+      { "type": "registry", "Hive": "HKCU", "Path": "Software\\Microsoft\\GameBar", "Name": "AutoGameModeEnabled", "Kind": "dword", "Value": "1" }
+    ]
+  },
+  {
+    "Id": "win.mmcss_games",
+    "Category": "Windows",
+    "Title": "Приоритеты планировщика мультимедиа для игр",
+    "Description": "Планировщик MMCSS выделяет задаче класса «Games» долю процессорного и графического времени. Значения по умолчанию задавались во времена Windows Vista и с тех пор не пересматривались.",
+    "Effect": "Приоритет GPU = 8, приоритет задачи = 6, категория High",
+    "ExpectedGain": "Ровнее frametime под фоновой нагрузкой",
+    "Risk": "Safe",
+    "Confidence": "Documented",
+    "RequiresElevation": true,
+    "Presets": ["Gaming", "Competitive", "Maximum", "Extreme"],
+    "Detect": { "type": "registry", "Hive": "HKLM", "Path": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games", "Name": "GPU Priority", "Expected": "8" },
+    "Apply": [
+      { "type": "registry", "Hive": "HKLM", "Path": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games", "Name": "GPU Priority", "Kind": "dword", "Value": "8" },
+      { "type": "registry", "Hive": "HKLM", "Path": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games", "Name": "Priority", "Kind": "dword", "Value": "6" },
+      { "type": "registry", "Hive": "HKLM", "Path": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games", "Name": "Scheduling Category", "Kind": "string", "Value": "High" },
+      { "type": "registry", "Hive": "HKLM", "Path": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games", "Name": "SFIO Priority", "Kind": "string", "Value": "High" }
+    ]
+  },
+  {
+    "Id": "win.system_responsiveness",
+    "Category": "Windows",
+    "Title": "Снизить резерв процессора под фоновые задачи",
+    "Description": "SystemResponsiveness задаёт, сколько процессорного времени Windows резервирует под фоновые процессы — по умолчанию 20%. Значение 10 отдаёт игре больше, но не душит звук, в отличие от нуля, который советуют в .bat-паках и который вызывает треск в наушниках.",
+    "Effect": "Резерв снижен с 20% до 10%",
+    "ExpectedGain": "Единицы процентов под фоновой нагрузкой",
+    "Risk": "Safe",
+    "Confidence": "Documented",
+    "RequiresElevation": true,
+    "Presets": ["Gaming", "Competitive", "Maximum", "Extreme"],
+    "Detect": { "type": "registry", "Hive": "HKLM", "Path": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile", "Name": "SystemResponsiveness", "Expected": "10" },
+    "Apply": [
+      { "type": "registry", "Hive": "HKLM", "Path": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile", "Name": "SystemResponsiveness", "Kind": "dword", "Value": "10" }
+    ]
+  },
+  {
+    "Id": "win.network_throttling_off",
+    "Category": "Network",
+    "Title": "Снять сетевое ограничение мультимедиа",
+    "Description": "Пока активна мультимедийная задача, Windows ограничивает сетевой стек десятью пакетами на миллисекунду. Для онлайн-игры это лишний источник дёрганого пинга.",
+    "Effect": "Ограничение снято",
+    "ExpectedGain": "Стабильнее пинг. На FPS не влияет",
+    "Risk": "Safe",
+    "Confidence": "Documented",
+    "RequiresElevation": true,
+    "Presets": ["Gaming", "Competitive", "Maximum", "Extreme"],
+    "Detect": { "type": "registry", "Hive": "HKLM", "Path": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile", "Name": "NetworkThrottlingIndex", "Expected": "4294967295" },
+    "Apply": [
+      { "type": "registry", "Hive": "HKLM", "Path": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile", "Name": "NetworkThrottlingIndex", "Kind": "dword", "Value": "0xFFFFFFFF" }
+    ]
+  },
+  {
+    "Id": "win.background_apps_off",
+    "Category": "Background",
+    "Title": "Запретить фоновую работу приложений Microsoft Store",
+    "Description": "Приложения из Store имеют право просыпаться в фоне и тянуть данные. Посреди катки это выглядит как необъяснимый фриз на секунду.",
+    "Effect": "Фоновая работа приложений Store отключена",
+    "ExpectedGain": "Меньше случайных просадок",
+    "Risk": "Moderate",
+    "Confidence": "Documented",
+    "Presets": ["Gaming", "Competitive", "Maximum", "Extreme"],
+    "Detect": { "type": "registry", "Hive": "HKCU", "Path": "Software\\Microsoft\\Windows\\CurrentVersion\\BackgroundAccessApplications", "Name": "GlobalUserDisabled", "Expected": "1" },
+    "Apply": [
+      { "type": "registry", "Hive": "HKCU", "Path": "Software\\Microsoft\\Windows\\CurrentVersion\\BackgroundAccessApplications", "Name": "GlobalUserDisabled", "Kind": "dword", "Value": "1" }
+    ]
+  },
+  {
+    "Id": "win.visual_effects",
+    "Category": "Windows",
+    "Title": "Отключить анимации интерфейса Windows",
+    "Description": "Анимации окон и прозрачность почти не влияют на FPS внутри игры, но заметно ускоряют отклик рабочего стола при сворачивании из полноэкранного режима.",
+    "Effect": "Анимации окон и прозрачность выключены",
+    "ExpectedGain": "Отзывчивее переключение между игрой и рабочим столом",
+    "Risk": "Safe",
+    "Confidence": "Community",
+    "Presets": ["Competitive", "Maximum", "Extreme"],
+    "Detect": { "type": "registry", "Hive": "HKCU", "Path": "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", "Name": "EnableTransparency", "Expected": "0" },
+    "Apply": [
+      { "type": "registry", "Hive": "HKCU", "Path": "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", "Name": "EnableTransparency", "Kind": "dword", "Value": "0" },
+      { "type": "registry", "Hive": "HKCU", "Path": "Control Panel\\Desktop\\WindowMetrics", "Name": "MinAnimate", "Kind": "string", "Value": "0" }
+    ]
+  },
+  {
+    "Id": "win.p2p_updates_off",
+    "Category": "Network",
+    "Title": "Запретить раздачу обновлений Windows другим ПК",
+    "Description": "По умолчанию Windows раздаёт скачанные обновления другим компьютерам в интернете. Это чужой трафик через твой канал и скачки пинга в самый неподходящий момент.",
+    "Effect": "Раздача в интернет отключена",
+    "ExpectedGain": "Стабильнее пинг",
+    "Risk": "Safe",
+    "Confidence": "Documented",
+    "RequiresElevation": true,
+    "Presets": ["Gaming", "Competitive", "Maximum", "Extreme", "Laptop"],
+    "Detect": { "type": "registry", "Hive": "HKLM", "Path": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\DeliveryOptimization\\Config", "Name": "DODownloadMode", "Expected": "0" },
+    "Apply": [
+      { "type": "registry", "Hive": "HKLM", "Path": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\DeliveryOptimization\\Config", "Name": "DODownloadMode", "Kind": "dword", "Value": "0" }
+    ]
+  },
+  {
+    "Id": "win.storage_sense_off",
+    "Category": "Storage",
+    "Title": "Отключить «Контроль памяти»",
+    "Description": "Контроль памяти запускает очистку диска по своему расписанию, не спрашивая, играешь ли ты сейчас. Дисковая активность посреди загрузки уровня — это фриз.",
+    "Effect": "Автоматическая очистка диска отключена",
+    "ExpectedGain": "Меньше случайных фризов при загрузке локаций",
+    "Risk": "Moderate",
+    "Confidence": "Community",
+    "Presets": ["Gaming", "Competitive", "Maximum", "Extreme"],
+    "Detect": { "type": "registry", "Hive": "HKCU", "Path": "Software\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy", "Name": "01", "Expected": "0" },
+    "Apply": [
+      { "type": "registry", "Hive": "HKCU", "Path": "Software\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy", "Name": "01", "Kind": "dword", "Value": "0" }
+    ]
+  },
+  {
+    "Id": "win.fso_global_keep",
+    "Category": "Windows",
+    "Title": "Оставить оптимизацию полноэкранного режима включённой",
+    "Description": "В .bat-паках повсеместно советуют отключать Fullscreen Optimizations. На Windows 11 это устаревший совет: современный полноэкранный оконный режим работает через flip-модель и даёт и Auto HDR, и переменную частоту обновления, и более низкую задержку. Этот пункт возвращает штатное поведение, если его кто-то сломал.",
+    "Effect": "Глобальное принудительное отключение FSO снимается",
+    "ExpectedGain": "Возвращает Auto HDR и VRR в оконном полноэкранном режиме",
+    "Risk": "Safe",
+    "Confidence": "Documented",
+    "Requires": ["os.build>=22000"],
+    "Presets": ["Safe", "Gaming"],
+    "Detect": { "type": "registry", "Hive": "HKCU", "Path": "System\\GameConfigStore", "Name": "GameDVR_DXGIHonorFSEWindowsCompatible", "Expected": "0" },
+    "Apply": [
+      { "type": "registry", "Hive": "HKCU", "Path": "System\\GameConfigStore", "Name": "GameDVR_DXGIHonorFSEWindowsCompatible", "Kind": "dword", "Value": "0" },
+      { "type": "registry", "Hive": "HKCU", "Path": "System\\GameConfigStore", "Name": "GameDVR_HonorUserFSEBehaviorMode", "Kind": "dword", "Value": "0" }
+    ]
+  }
+]

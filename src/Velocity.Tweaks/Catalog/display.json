@@ -1,0 +1,16 @@
+[
+  {
+    "Id": "display.max_refresh",
+    "Category": "Display",
+    "Title": "Максимальная частота обновления монитора",
+    "Description": "Windows регулярно выставляет 60 Гц на мониторе, который умеет 144 или 165. Игра может выдавать 200 кадров, но на экран попадёт только 60 из них. Это самая частая и самая заметная потеря во всей системе.",
+    "Effect": "Каждый монитор переводится на максимальную частоту, доступную на его текущем разрешении",
+    "ExpectedGain": "Плавность картинки и заметно ниже задержка ввода",
+    "Risk": "Safe",
+    "Confidence": "Measured",
+    "RequiresGameClosed": false,
+    "Presets": ["Safe", "Gaming", "Competitive", "Maximum", "Extreme", "Laptop"],
+    "Detect": { "type": "display_mode", "Mode": "max_refresh" },
+    "Apply": [ { "type": "display_mode", "Mode": "max_refresh" } ]
+  }
+]

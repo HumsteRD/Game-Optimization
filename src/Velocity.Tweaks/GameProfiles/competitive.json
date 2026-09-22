@@ -1,0 +1,116 @@
+[
+  {
+    "Id": "cs2",
+    "Name": "Counter-Strike 2",
+    "SteamAppId": "730",
+    "Executables": ["cs2.exe"],
+    "Engine": "Source2",
+    "LaunchOptions": "-novid -high -nojoy -allow_third_party_software",
+    "LaunchOptionsWhy": "Пропуск заставки, высокий приоритет процесса, отключение опроса геймпадов (он даёт лишние прерывания на частоте опроса мыши).",
+    "Config": [
+      {
+        "File": "{steam_userdata}/730/local/cfg/autoexec.cfg",
+        "Format": "SourceCfg",
+        "CreateIfMissing": true,
+        "Why": "Команды, которые нельзя выставить через меню игры.",
+        "Entries": {
+          "fps_max": "0",
+          "fps_max_ui": "120",
+          "engine_no_focus_sleep": "0",
+          "cl_disablehtmlmotd": "1",
+          "cl_forcepreload": "1",
+          "r_drawtracers_firstperson": "0",
+          "cl_join_advertise": "2"
+        }
+      }
+    ],
+    "Settings": [
+      { "Name": "Режим отображения", "Value": "Полноэкранный", "Why": "Эксклюзивный полноэкранный режим в CS2 даёт самую низкую задержку ввода.", "Impact": "High" },
+      { "Name": "Многоядерная обработка", "Value": "Включено", "Why": "Без неё игра использует одно ядро процессора.", "Impact": "High" },
+      { "Name": "Сглаживание MSAA", "Value": "CMAA2", "Why": "CMAA2 почти не стоит кадров, в отличие от MSAA 4x/8x.", "Impact": "High" },
+      { "Name": "Детализация теней", "Value": "Средняя", "Why": "Тени — самая дорогая настройка в CS2. Ниже средней противников становится хуже видно, выше — падает FPS без выигрыша в информации.", "Impact": "High" },
+      { "Name": "Детализация моделей и текстур", "Value": "Низкая", "Why": "Почти не влияет на видимость противника, освобождает заметную часть кадрового времени.", "When": ["gpu.vram_gb<8"], "Impact": "Medium" },
+      { "Name": "Эффекты частиц", "Value": "Низкие", "Why": "Дым и вспышки перестают ронять FPS в решающие моменты — именно там, где просадка стоит раунда.", "Impact": "High" },
+      { "Name": "NVIDIA Reflex", "Value": "Включено + Boost", "Why": "Снижает задержку ввода сильнее любой системной настройки.", "When": ["gpu.vendor=nvidia"], "Impact": "High" },
+      { "Name": "Вертикальная синхронизация", "Value": "Выключена", "Why": "Добавляет целый кадр задержки.", "Impact": "High" }
+    ],
+    "NvidiaSettings": [
+      { "Setting": "0x007BA09E", "Value": 1, "Why": "Очередь заранее подготовленных кадров = 1: минимальная задержка от мыши до экрана." }
+    ],
+    "Notes": [
+      "Ограничивай FPS не игрой, а панелью драйвера — на 3 кадра ниже частоты монитора, если включён G-Sync или FreeSync.",
+      "Не ставь fps_max равным частоте монитора без VRR: лучше либо заметно выше, либо точно по частоте."
+    ]
+  },
+  {
+    "Id": "valorant",
+    "Name": "VALORANT",
+    "Executables": ["VALORANT-Win64-Shipping.exe"],
+    "Engine": "UnrealEngine4",
+    "Config": [],
+    "Settings": [
+      { "Name": "Режим отображения", "Value": "Полноэкранный", "Why": "Самая низкая задержка ввода.", "Impact": "High" },
+      { "Name": "Ограничение FPS в меню", "Value": "Включено, 120", "Why": "Незачем греть видеокарту на экране выбора агента.", "Impact": "Low" },
+      { "Name": "Качество материалов", "Value": "Низкое", "Why": "На видимость противника не влияет вообще.", "Impact": "Medium" },
+      { "Name": "Качество детализации", "Value": "Низкое", "Why": "Убирает лишнюю геометрию, которая только загораживает обзор.", "Impact": "Medium" },
+      { "Name": "Сглаживание", "Value": "MSAA 2x", "Why": "Компромисс: силуэты на дальних дистанциях остаются читаемыми, но стоит это недорого.", "Impact": "Medium" },
+      { "Name": "Виньетка", "Value": "Выключена", "Why": "Затемняет углы экрана — именно там появляются противники.", "Impact": "Medium" },
+      { "Name": "Улучшить чёткость", "Value": "Выключено", "Why": "Постобработка добавляет кадр задержки.", "Impact": "Medium" },
+      { "Name": "Блум и искажение", "Value": "Выключено", "Why": "Вспышки способностей перестают слепить.", "Impact": "Medium" }
+    ],
+    "Notes": [
+      "Vanguard загружается при старте Windows и блокирует часть драйверов мониторинга. Применяй системные оптимизации до запуска игры.",
+      "Riot запрещает сторонние оверлеи поверх игры — не держи включёнными MSI Afterburner и RTSS."
+    ]
+  },
+  {
+    "Id": "apex",
+    "Name": "Apex Legends",
+    "SteamAppId": "1172470",
+    "Executables": ["r5apex.exe"],
+    "Engine": "Other",
+    "LaunchOptions": "-high -preload -forcenovsync +fps_max 0",
+    "LaunchOptionsWhy": "Предзагрузка ресурсов убирает подтормаживания в начале матча, снятие синхронизации — задержку кадра.",
+    "Config": [
+      {
+        "File": "{documents}/Respawn/Apex/local/autoexec.cfg",
+        "Format": "SourceCfg",
+        "CreateIfMissing": true,
+        "Why": "Apex построен на движке Source и понимает те же консольные команды.",
+        "Entries": {
+          "fps_max": "0",
+          "cl_gib_allow": "0",
+          "mat_letterbox_aspect_goal": "0",
+          "cl_ragdoll_maxcount": "0"
+        }
+      }
+    ],
+    "Settings": [
+      { "Name": "Режим отображения", "Value": "Полноэкранный", "Why": "Оконный режим в Apex стоит заметной части кадров.", "Impact": "High" },
+      { "Name": "Сглаживание", "Value": "Выключено", "Why": "TSAA в Apex сильно мылит картинку и стоит кадров.", "Impact": "High" },
+      { "Name": "Качество моделей", "Value": "Низкое", "Why": "Один из самых дорогих параметров движка.", "Impact": "High" },
+      { "Name": "Динамические тени", "Value": "Выключены", "Why": "Даёт больше кадров, чем любая другая настройка Apex.", "Impact": "High" },
+      { "Name": "Сглаживание частиц", "Value": "Выключено", "Why": "Просадки в замесах происходят именно из-за частиц.", "Impact": "High" },
+      { "Name": "Поток текстур", "Value": "Высокий", "Why": "Если видеопамяти хватает — качество бесплатное.", "When": ["gpu.vram_gb>=8"], "Impact": "Low" },
+      { "Name": "Поток текстур", "Value": "Низкий или Средний", "Why": "При нехватке видеопамяти Apex начинает дёргаться при подгрузке текстур.", "When": ["gpu.vram_gb<8"], "Impact": "High" }
+    ],
+    "Notes": []
+  },
+  {
+    "Id": "dota2",
+    "Name": "Dota 2",
+    "SteamAppId": "570",
+    "Executables": ["dota2.exe"],
+    "Engine": "Source2",
+    "LaunchOptions": "-novid -high -console",
+    "LaunchOptionsWhy": "Пропуск заставки и высокий приоритет процесса.",
+    "Config": [],
+    "Settings": [
+      { "Name": "Рендерер", "Value": "Vulkan", "Why": "На современных AMD и NVIDIA Vulkan в Dota 2 стабильно быстрее DirectX 11 и даёт ровнее frametime.", "Impact": "High" },
+      { "Name": "Сглаживание", "Value": "FXAA", "Why": "MSAA в Source 2 дорогой, FXAA почти бесплатный.", "Impact": "Medium" },
+      { "Name": "Качество теней", "Value": "Среднее", "Why": "Высокие тени в Dota 2 дают ощутимую просадку в массовых драках.", "Impact": "High" },
+      { "Name": "Сглаживание частиц", "Value": "Выключено", "Why": "Просадки во время замесов идут в первую очередь от частиц способностей.", "Impact": "High" }
+    ],
+    "Notes": []
+  }
+]

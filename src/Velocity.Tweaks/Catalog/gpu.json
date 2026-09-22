@@ -1,0 +1,100 @@
+[
+  {
+    "Id": "gpu.hags_on",
+    "Category": "Gpu",
+    "Title": "Аппаратное ускорение планирования GPU",
+    "Description": "HAGS перекладывает управление очередью кадров с процессора на саму видеокарту. На связке NVIDIA с Reflex обычно даёт плюс, на части систем — минус. Это ровно тот случай, когда нужно замерить до и после, а не верить гайдам.",
+    "Effect": "HwSchMode = 2, требуется перезагрузка",
+    "ExpectedGain": "От −3% до +7% в зависимости от системы. Обязательно замерить",
+    "Risk": "Advanced",
+    "Confidence": "Documented",
+    "RequiresElevation": true,
+    "RequiresReboot": true,
+    "Requires": ["os.build>=19041"],
+    "Presets": ["Maximum", "Extreme"],
+    "Detect": { "type": "registry", "Hive": "HKLM", "Path": "SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers", "Name": "HwSchMode", "Expected": "2" },
+    "Apply": [
+      { "type": "registry", "Hive": "HKLM", "Path": "SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers", "Name": "HwSchMode", "Kind": "dword", "Value": "2" }
+    ]
+  },
+  {
+    "Id": "gpu.nv.power_mode",
+    "Category": "Gpu",
+    "Title": "NVIDIA: режим максимальной производительности",
+    "Description": "Драйвер перестаёт сбрасывать частоты видеокарты между сценами. Убирает задержку раскрутки частот в начале боя. На ноутбуке включать не стоит — там это только нагрев и троттлинг.",
+    "Effect": "Управление электропитанием = предпочтителен режим максимальной производительности",
+    "ExpectedGain": "Стабильнее частоты, меньше просадок в первые секунды нагрузки",
+    "Risk": "Moderate",
+    "Confidence": "Documented",
+    "Requires": ["gpu.vendor=nvidia", "machine.is_laptop=false"],
+    "Presets": ["Competitive", "Maximum", "Extreme"],
+    "Apply": [
+      { "type": "nvidia_profile", "Setting": "0x1057EB71", "Value": 1 }
+    ]
+  },
+  {
+    "Id": "gpu.nv.low_latency",
+    "Category": "Gpu",
+    "Title": "NVIDIA: минимальная задержка ввода",
+    "Description": "Ограничивает очередь кадров, которые процессор готовит заранее для видеокарты. Когда упор идёт в видеокарту, это снимает 5–20 мс задержки между движением мыши и картинкой на экране.",
+    "Effect": "Максимум заранее подготовленных кадров = 1",
+    "ExpectedGain": "Задержка ввода ниже на 5–20 мс. Средний FPS не меняется",
+    "Risk": "Safe",
+    "Confidence": "Documented",
+    "Requires": ["gpu.vendor=nvidia"],
+    "Presets": ["Competitive", "Maximum", "Extreme"],
+    "Apply": [
+      { "type": "nvidia_profile", "Setting": "0x007BA09E", "Value": 1 }
+    ]
+  },
+  {
+    "Id": "gpu.nv.texture_quality",
+    "Category": "Gpu",
+    "Title": "NVIDIA: фильтрация текстур в режиме производительности",
+    "Description": "Драйвер немного упрощает фильтрацию текстур. Разницу в картинке на глаз не видно, а несколько процентов кадров освобождается.",
+    "Effect": "Качество фильтрации текстур = высокая производительность",
+    "ExpectedGain": "Обычно +1–4% FPS",
+    "Risk": "Safe",
+    "Confidence": "Documented",
+    "Requires": ["gpu.vendor=nvidia"],
+    "Presets": ["Maximum", "Extreme"],
+    "Apply": [
+      { "type": "nvidia_profile", "Setting": "0x00CE2691", "Value": 16 }
+    ]
+  },
+  {
+    "Id": "gpu.amd.ulps_off",
+    "Category": "Gpu",
+    "Title": "AMD: отключить сверхнизкое энергопотребление (ULPS)",
+    "Description": "ULPS глубоко усыпляет видеокарту в простое. Пробуждение занимает время, и это видно как рывок в первые мгновения нагрузки. На настольном ПК выигрыш от ULPS почти нулевой.",
+    "Effect": "EnableUlps = 0, требуется перезагрузка",
+    "ExpectedGain": "Убирает рывок при выходе из простоя",
+    "Risk": "Advanced",
+    "Confidence": "Community",
+    "RequiresElevation": true,
+    "RequiresReboot": true,
+    "Requires": ["gpu.vendor=amd", "machine.is_laptop=false"],
+    "Presets": ["Maximum", "Extreme"],
+    "Detect": { "type": "registry", "Hive": "HKLM", "Path": "SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0000", "Name": "EnableUlps", "Expected": "0" },
+    "Apply": [
+      { "type": "registry", "Hive": "HKLM", "Path": "SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0000", "Name": "EnableUlps", "Kind": "dword", "Value": "0" }
+    ]
+  },
+  {
+    "Id": "gpu.amd.texture_quality",
+    "Category": "Gpu",
+    "Title": "AMD: фильтрация текстур в режиме производительности",
+    "Description": "Аналог настройки NVIDIA: драйвер упрощает фильтрацию текстур. На глаз незаметно, несколько процентов кадров освобождается.",
+    "Effect": "Качество фильтрации текстур = производительность",
+    "ExpectedGain": "Обычно +1–3% FPS",
+    "Risk": "Moderate",
+    "Confidence": "Community",
+    "RequiresElevation": true,
+    "Requires": ["gpu.vendor=amd"],
+    "Presets": ["Maximum", "Extreme"],
+    "Detect": { "type": "registry", "Hive": "HKLM", "Path": "SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0000", "Name": "TFQ", "Expected": "2" },
+    "Apply": [
+      { "type": "registry", "Hive": "HKLM", "Path": "SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0000", "Name": "TFQ", "Kind": "dword", "Value": "2" }
+    ]
+  }
+]

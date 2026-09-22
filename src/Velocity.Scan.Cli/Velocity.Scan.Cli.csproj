@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>velocity-scan</AssemblyName>
+    <RootNamespace>Velocity.Scan.Cli</RootNamespace>
+    <InvariantGlobalization>false</InvariantGlobalization>
+
+    <Product>VELOCITY Scan</Product>
+    <AssemblyTitle>VELOCITY — диагностика системы для игр</AssemblyTitle>
+    <Description>Читает конфигурацию ПК и находит настройки, которые режут FPS. Ничего не меняет.</Description>
+    <Version>0.1.0</Version>
+    <Company>VELOCITY</Company>
+    <Copyright>© 2026</Copyright>
+
+    <!-- Автономная сборка: на чужом ПК .NET 9 не установлен. -->
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <!-- Обрезку НЕ включаем: System.Management (WMI) держится на рефлексии,
+         и триммер молча выкинет типы, из-за чего скан упадёт уже у пользователя. -->
+    <PublishTrimmed>false</PublishTrimmed>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Velocity.Core\Velocity.Core.csproj" />
+    <ProjectReference Include="..\Velocity.Hardware\Velocity.Hardware.csproj" />
+  </ItemGroup>
+
+</Project>

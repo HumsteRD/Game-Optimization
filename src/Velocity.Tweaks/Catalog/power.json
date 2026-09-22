@@ -1,0 +1,151 @@
+[
+  {
+    "Id": "power.ultimate_plan",
+    "Category": "Power",
+    "Title": "Схема питания «Максимальная производительность»",
+    "Description": "Скрытая схема питания Windows без парковки ядер и без переходов энергосостояний. На настольном ПК убирает микрозадержки при резком росте нагрузки — ровно то, что происходит при входе в бой.",
+    "Effect": "Создаётся и активируется схема Ultimate Performance",
+    "ExpectedGain": "На системах со схемой «Экономия энергии» до +30% FPS, со «Сбалансированной» — единицы процентов",
+    "Risk": "Moderate",
+    "Confidence": "Documented",
+    "RequiresElevation": true,
+    "Requires": [
+      "machine.is_laptop=false"
+    ],
+    "Presets": [
+      "Gaming",
+      "Competitive",
+      "Maximum",
+      "Extreme"
+    ],
+    "Detect": {
+      "type": "powercfg",
+      "Operation": "activate",
+      "SchemeGuid": "e9a42b02-d5df-448d-aa00-03f14749eb61"
+    },
+    "Apply": [
+      {
+        "type": "powercfg",
+        "Operation": "duplicate",
+        "SchemeGuid": "e9a42b02-d5df-448d-aa00-03f14749eb61"
+      },
+      {
+        "type": "powercfg",
+        "Operation": "activate",
+        "SchemeGuid": "e9a42b02-d5df-448d-aa00-03f14749eb61"
+      }
+    ]
+  },
+  {
+    "Id": "power.core_parking_off",
+    "Category": "Power",
+    "Title": "Отключить парковку ядер процессора",
+    "Description": "Windows усыпляет часть ядер ради экономии энергии и будит их с задержкой. На старых Ryzen и Intel это заметно по рывкам в первые секунды нагрузки.",
+    "Effect": "Минимум активных ядер = 100%",
+    "ExpectedGain": "Заметно на Ryzen 1000–3000 и Intel до 10-го поколения",
+    "Risk": "Moderate",
+    "Confidence": "Documented",
+    "RequiresElevation": true,
+    "Requires": [
+      "machine.is_laptop=false"
+    ],
+    "Presets": [
+      "Gaming",
+      "Competitive",
+      "Maximum",
+      "Extreme"
+    ],
+    "Apply": [
+      {
+        "type": "powercfg",
+        "Operation": "setvalue",
+        "SubGroupGuid": "54533251-82be-4824-96c1-47b60b740d00",
+        "SettingGuid": "0cc5b647-c1df-4637-891a-dec35c318583",
+        "AcValue": 100
+      }
+    ]
+  },
+  {
+    "Id": "power.usb_selective_suspend_off",
+    "Category": "Power",
+    "Title": "Отключить энергосбережение USB",
+    "Description": "Windows имеет право усыплять USB-устройства. Для мыши это означает пропуски отсчётов и «залипание» курсора в момент пробуждения порта.",
+    "Effect": "Выборочная приостановка USB выключена",
+    "ExpectedGain": "Ровнее движение мыши, без микропропаданий ввода",
+    "Risk": "Safe",
+    "Confidence": "Documented",
+    "RequiresElevation": true,
+    "Presets": [
+      "Gaming",
+      "Competitive",
+      "Maximum",
+      "Extreme"
+    ],
+    "Apply": [
+      {
+        "type": "powercfg",
+        "Operation": "setvalue",
+        "SubGroupGuid": "2a737441-1930-4402-8d77-b2bebba308a3",
+        "SettingGuid": "48e6b7a6-50f5-4782-a5d4-53bb8f07e226",
+        "AcValue": 0
+      }
+    ]
+  },
+  {
+    "Id": "power.pcie_aspm_off",
+    "Category": "Power",
+    "Title": "Отключить энергосбережение шины PCI Express",
+    "Description": "Управление питанием линий PCIe добавляет микрозадержки при переходах между состояниями. Видеокарта живёт именно на этой шине.",
+    "Effect": "ASPM выключен",
+    "ExpectedGain": "Единицы процентов, стабильнее frametime",
+    "Risk": "Moderate",
+    "Confidence": "Documented",
+    "RequiresElevation": true,
+    "Requires": [
+      "machine.is_laptop=false"
+    ],
+    "Presets": [
+      "Competitive",
+      "Maximum",
+      "Extreme"
+    ],
+    "Apply": [
+      {
+        "type": "powercfg",
+        "Operation": "setvalue",
+        "SubGroupGuid": "501a4d13-42af-4429-9fd1-a8218c268e20",
+        "SettingGuid": "ee12f906-d277-404b-b6da-e5fa1a576df5",
+        "AcValue": 0
+      }
+    ]
+  },
+  {
+    "Id": "power.hdd_never_sleep",
+    "Category": "Power",
+    "Title": "Не усыплять накопители",
+    "Description": "Уснувший диск просыпается секунды. Если игра в этот момент подгружает текстуры, пользователь видит фриз.",
+    "Effect": "Тайм-аут отключения дисков = никогда",
+    "Risk": "Safe",
+    "Confidence": "Documented",
+    "RequiresElevation": true,
+    "Requires": [
+      "machine.is_laptop=false"
+    ],
+    "Presets": [
+      "Gaming",
+      "Competitive",
+      "Maximum",
+      "Extreme"
+    ],
+    "Apply": [
+      {
+        "type": "powercfg",
+        "Operation": "setvalue",
+        "SubGroupGuid": "0012ee47-9041-4b5d-9b77-535fba8b1442",
+        "SettingGuid": "6738e2c4-e8a5-4a42-b16a-e040e769756e",
+        "AcValue": 0
+      }
+    ],
+    "ExpectedGain": "Убирает фризы при подгрузке данных с уснувшего диска"
+  }
+]

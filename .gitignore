@@ -1,0 +1,17 @@
+# Сборка
+bin/
+obj/
+dist/
+dist-app/
+out/
+release/
+
+# Среды разработки
+.vs/
+.idea/
+*.user
+*.suo
+
+# Временные файлы
+*.tmp
+*.log

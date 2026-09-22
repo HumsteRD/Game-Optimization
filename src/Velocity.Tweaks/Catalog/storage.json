@@ -1,0 +1,53 @@
+[
+  {
+    "Id": "storage.trim_on",
+    "Category": "Storage",
+    "Title": "Включить TRIM для SSD",
+    "Description": "TRIM сообщает накопителю, какие блоки больше не нужны. Без него SSD со временем заметно теряет в скорости записи, потому что вынужден стирать блоки прямо во время записи новых данных. Иногда TRIM оказывается выключен после переноса системы сторонними программами.",
+    "Effect": "Уведомления об удалении включены",
+    "ExpectedGain": "Сохраняет скорость SSD в долгосрочной перспективе",
+    "Risk": "Safe",
+    "Confidence": "Documented",
+    "RequiresElevation": true,
+    "Requires": ["storage.has_ssd=true"],
+    "Presets": ["Safe", "Gaming", "Competitive", "Maximum", "Extreme", "Laptop"],
+    "Detect": { "type": "registry", "Hive": "HKLM", "Path": "SYSTEM\\CurrentControlSet\\Control\\FileSystem", "Name": "DisableDeleteNotify", "Expected": "0" },
+    "Apply": [
+      { "type": "registry", "Hive": "HKLM", "Path": "SYSTEM\\CurrentControlSet\\Control\\FileSystem", "Name": "DisableDeleteNotify", "Kind": "dword", "Value": "0" }
+    ]
+  },
+  {
+    "Id": "storage.ntfs_last_access_off",
+    "Category": "Storage",
+    "Title": "Не записывать время последнего доступа к файлам",
+    "Description": "NTFS по умолчанию обновляет отметку времени при каждом чтении файла. Игра, читающая тысячи мелких файлов при загрузке уровня, получает тысячи лишних операций записи на пустом месте.",
+    "Effect": "Обновление времени доступа отключено",
+    "ExpectedGain": "Чуть быстрее загрузка уровней, меньше износ SSD",
+    "Risk": "Moderate",
+    "Confidence": "Documented",
+    "RequiresElevation": true,
+    "RequiresReboot": true,
+    "Presets": ["Gaming", "Competitive", "Maximum", "Extreme"],
+    "Detect": { "type": "registry", "Hive": "HKLM", "Path": "SYSTEM\\CurrentControlSet\\Control\\FileSystem", "Name": "NtfsDisableLastAccessUpdate", "Expected": "2147483649" },
+    "Apply": [
+      { "type": "registry", "Hive": "HKLM", "Path": "SYSTEM\\CurrentControlSet\\Control\\FileSystem", "Name": "NtfsDisableLastAccessUpdate", "Kind": "dword", "Value": "0x80000001" }
+    ]
+  },
+  {
+    "Id": "win.fast_startup_off",
+    "Category": "Storage",
+    "Title": "Отключить быстрый запуск Windows",
+    "Description": "Быстрый запуск не выключает систему полностью, а сохраняет образ ядра на диск. Из-за этого драйверы и состояние устройств не сбрасываются между сеансами — отсюда «после перезагрузки работает, после выключения нет». На SSD выигрыш во времени загрузки минимален, а источник странных сбоев устраняется.",
+    "Effect": "Гибридное завершение работы отключено",
+    "ExpectedGain": "Убирает накопление сбоев драйверов между сеансами",
+    "Risk": "Moderate",
+    "Confidence": "Documented",
+    "RequiresElevation": true,
+    "Requires": ["storage.has_ssd=true", "machine.is_laptop=false"],
+    "Presets": ["Maximum", "Extreme"],
+    "Detect": { "type": "registry", "Hive": "HKLM", "Path": "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Power", "Name": "HiberbootEnabled", "Expected": "0" },
+    "Apply": [
+      { "type": "registry", "Hive": "HKLM", "Path": "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Power", "Name": "HiberbootEnabled", "Kind": "dword", "Value": "0" }
+    ]
+  }
+]
